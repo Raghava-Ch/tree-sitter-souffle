@@ -53,7 +53,28 @@ const NATURAL = /[0-9]+/;
 // https://github.com/souffle-lang/souffle/blob/2.3/src/parser/parser.yy#L282
 const PREC = {
   plus: 18,
-  times: 19
+  times: 19,
+  PAREN_DECLARATOR: -10,
+  ASSIGNMENT: -2,
+  CONDITIONAL: -1,
+  DEFAULT: 0,
+  LOGICAL_OR: 1,
+  LOGICAL_AND: 2,
+  INCLUSIVE_OR: 3,
+  EXCLUSIVE_OR: 4,
+  BITWISE_AND: 5,
+  EQUAL: 6,
+  RELATIONAL: 7,
+  OFFSETOF: 8,
+  SHIFT: 9,
+  ADD: 10,
+  MULTIPLY: 11,
+  CAST: 12,
+  SIZEOF: 13,
+  UNARY: 14,
+  CALL: 15,
+  FIELD: 16,
+  SUBSCRIPT: 17,
 };
 
 // https://souffle-lang.github.io/arguments#binary-operation
@@ -115,9 +136,206 @@ module.exports = grammar({
       $.type_decl,
       $.legacy_type_decl,
       $.preprocessor,
+      $.preproc_include,
+      $.preproc_if,
+      $.preproc_ifdef,
     )),
 
     // https://gcc.gnu.org/onlinedocs/cpp/Preprocessor-Output.html
+    // Preprocesser
+    ...preprocIf('', $ => $._block_item),
+
+    _preproc_expression: $ => choice(
+      $.identifier,
+      $.number_literal,
+      $.char_literal,
+      alias($.preproc_unary_expression, $.unary_expression),
+      alias($.preproc_binary_expression, $.binary_expression),
+      alias($.preproc_parenthesized_expression, $.parenthesized_expression),
+    ),
+
+    expression: $ => choice(
+      $.binary_expression,
+    ),
+
+    preproc_parenthesized_expression: $ => seq(
+      '(',
+      $._preproc_expression,
+      ')',
+    ),
+
+    preproc_unary_expression: $ => prec.left(PREC.UNARY, seq(
+      field('operator', choice('!', '~', '-', '+')),
+      field('argument', $._preproc_expression),
+    )),
+
+    preproc_binary_expression: $ => {
+      const table = [
+        ['+', PREC.ADD],
+        ['-', PREC.ADD],
+        ['*', PREC.MULTIPLY],
+        ['/', PREC.MULTIPLY],
+        ['%', PREC.MULTIPLY],
+        ['||', PREC.LOGICAL_OR],
+        ['&&', PREC.LOGICAL_AND],
+        ['|', PREC.INCLUSIVE_OR],
+        ['^', PREC.EXCLUSIVE_OR],
+        ['&', PREC.BITWISE_AND],
+        ['==', PREC.EQUAL],
+        ['!=', PREC.EQUAL],
+        ['>', PREC.RELATIONAL],
+        ['>=', PREC.RELATIONAL],
+        ['<=', PREC.RELATIONAL],
+        ['<', PREC.RELATIONAL],
+        ['<<', PREC.SHIFT],
+        ['>>', PREC.SHIFT],
+      ];
+
+      return choice(...table.map(([operator, precedence]) => {
+        return prec.left(precedence, seq(
+          field('left', $._preproc_expression),
+          // @ts-ignore
+          field('operator', operator),
+          field('right', $._preproc_expression),
+        ));
+      }));
+    },
+
+    parenthesized_expression: $ => seq(
+      '(',
+      choice($.expression, $.comma_expression),
+      ')',
+    ),
+
+    comma_expression: $ => seq(
+      field('left', $.expression),
+      ',',
+      field('right', choice($.expression, $.comma_expression)),
+    ),
+
+    unary_expression: $ => prec.left(PREC.UNARY, seq(
+      field('operator', choice('!', '~', '-', '+')),
+      field('argument', $.expression),
+    )),
+
+    binary_expression: $ => {
+      const table = [
+        ['+', PREC.ADD],
+        ['-', PREC.ADD],
+        ['*', PREC.MULTIPLY],
+        ['/', PREC.MULTIPLY],
+        ['%', PREC.MULTIPLY],
+        ['||', PREC.LOGICAL_OR],
+        ['&&', PREC.LOGICAL_AND],
+        ['|', PREC.INCLUSIVE_OR],
+        ['^', PREC.EXCLUSIVE_OR],
+        ['&', PREC.BITWISE_AND],
+        ['==', PREC.EQUAL],
+        ['!=', PREC.EQUAL],
+        ['>', PREC.RELATIONAL],
+        ['>=', PREC.RELATIONAL],
+        ['<=', PREC.RELATIONAL],
+        ['<', PREC.RELATIONAL],
+        ['<<', PREC.SHIFT],
+        ['>>', PREC.SHIFT],
+      ];
+
+      return choice(...table.map(([operator, precedence]) => {
+        return prec.left(precedence, seq(
+          field('left', $.expression),
+          // @ts-ignore
+          field('operator', operator),
+          field('right', $.expression),
+        ));
+      }));
+    },
+
+    char_literal: $ => seq(
+      choice('L\'', 'u\'', 'U\'', 'u8\'', '\''),
+      repeat1(choice(
+        $.escape_sequence,
+        alias(token.immediate(/[^\n']/), $.character),
+      )),
+      '\'',
+    ),
+
+    number_literal: _ => {
+      const separator = '\'';
+      const hex = /[0-9a-fA-F]/;
+      const decimal = /[0-9]/;
+      const hexDigits = seq(repeat1(hex), repeat(seq(separator, repeat1(hex))));
+      const decimalDigits = seq(repeat1(decimal), repeat(seq(separator, repeat1(decimal))));
+      return token(seq(
+        optional(/[-\+]/),
+        optional(choice(/0[xX]/, /0[bB]/)),
+        choice(
+          seq(
+            choice(
+              decimalDigits,
+              seq(/0[bB]/, decimalDigits),
+              seq(/0[xX]/, hexDigits),
+            ),
+            optional(seq('.', optional(hexDigits))),
+          ),
+          seq('.', decimalDigits),
+        ),
+        optional(seq(
+          /[eEpP]/,
+          optional(seq(
+            optional(/[-\+]/),
+            hexDigits,
+          )),
+        )),
+        /[uUlLwWfFbBdD]*/,
+      ));
+    },
+
+    _block_item: $ => choice(
+      $.preproc_if,
+      $.preproc_ifdef,
+      $.preproc_include,
+    ),
+
+    preproc_include: $ => seq(
+      preprocessor('include'),
+      field('path', choice(
+        $.string_literal,
+        $.system_lib_string,
+        $.identifier,
+      )),
+      token.immediate(/\r?\n/),
+    ),
+
+    identifier: _ =>
+      // eslint-disable-next-line max-len
+      /(\p{XID_Start}|\$|_|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})(\p{XID_Continue}|\$|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*/,
+    
+    system_lib_string: _ => token(seq(
+        '<',
+        repeat(choice(/[^>\n]/, '\\>')),
+        '>',
+      )),
+
+    string_literal: $ => seq(
+      choice('L"', 'u"', 'U"', 'u8"', '"'),
+      repeat(choice(
+        alias(token.immediate(prec(1, /[^\\"\n]+/)), $.string_content),
+        $.escape_sequence,
+      )),
+      '"',
+    ),
+
+    escape_sequence: _ => token(prec(1, seq(
+      '\\',
+      choice(
+        /[^xuU]/,
+        /\d{2,3}/,
+        /x[0-9a-fA-F]{2,}/,
+        /u[0-9a-fA-F]{4}/,
+        /U[0-9a-fA-F]{8}/,
+      ),
+    ))),
+
     preprocessor: $ => seq(
       '#line',
       field('line', NATURAL),
@@ -681,6 +899,85 @@ module.exports = grammar({
   }
 });
 
+/**
+  * Creates a preprocessor regex rule
+  *
+  * @param {RegExp|Rule|String} command
+  *
+  * @return {AliasRule}
+  */
+function preprocessor(command) {
+  return alias(new RegExp('#[ \t]*' + command), '#' + command);
+}
+
+
+/**
+ *
+ * @param {string} suffix
+ *
+ * @param {RuleBuilder<string>} content
+ *
+ * @param {number} precedence
+ *
+ * @return {RuleBuilders<string, string>}
+ */
+function preprocIf(suffix, content, precedence = 0) {
+  /**
+    *
+    * @param {GrammarSymbols<string>} $
+    *
+    * @return {ChoiceRule}
+    *
+    */
+  function alternativeBlock($) {
+    return choice(
+      suffix ? alias($['preproc_else' + suffix], $.preproc_else) : $.preproc_else,
+      suffix ? alias($['preproc_elif' + suffix], $.preproc_elif) : $.preproc_elif,
+      suffix ? alias($['preproc_elifdef' + suffix], $.preproc_elifdef) : $.preproc_elifdef,
+    );
+  }
+
+  return {
+    ['preproc_if' + suffix]: $ => prec(precedence, seq(
+      preprocessor('if'),
+      field('condition', $._preproc_expression),
+      '\n',
+      repeat(content($)),
+      field('alternative', optional(alternativeBlock($))),
+      preprocessor('endif'),
+    )),
+
+    ['preproc_ifdef' + suffix]: $ => prec(precedence, seq(
+      choice(preprocessor('ifdef'), preprocessor('ifndef')),
+      field('name', $.identifier),
+      repeat(content($)),
+      field('alternative', optional(alternativeBlock($))),
+      preprocessor('endif'),
+    )),
+
+    ['preproc_else' + suffix]: $ => prec(precedence, seq(
+      preprocessor('else'),
+      repeat(content($)),
+    )),
+
+    ['preproc_elif' + suffix]: $ => prec(precedence, seq(
+      preprocessor('elif'),
+      field('condition', $._preproc_expression),
+      '\n',
+      repeat(content($)),
+      field('alternative', optional(alternativeBlock($))),
+    )),
+
+    ['preproc_elifdef' + suffix]: $ => prec(precedence, seq(
+      choice(preprocessor('elifdef'), preprocessor('elifndef')),
+      field('name', $.identifier),
+      repeat(content($)),
+      field('alternative', optional(alternativeBlock($))),
+    )),
+  };
+}
+
 // Local Variables:
 // js2-basic-offset: 2
 // End:
+
