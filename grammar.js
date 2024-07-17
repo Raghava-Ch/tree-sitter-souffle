@@ -21,7 +21,7 @@ function commas(x) {
 }
 
 function commas1(x) {
-  return sep1(',', x);
+  return sep1(choice(','), x);
 }
 
 function dots1(x) {
@@ -309,12 +309,12 @@ module.exports = grammar({
     identifier: _ =>
       // eslint-disable-next-line max-len
       /(\p{XID_Start}|\$|_|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})(\p{XID_Continue}|\$|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*/,
-    
+
     system_lib_string: _ => token(seq(
-        '<',
-        repeat(choice(/[^>\n]/, '\\>')),
-        '>',
-      )),
+      '<',
+      repeat(choice(/[^>\n]/, '\\>')),
+      '>',
+    )),
 
     string_literal: $ => seq(
       choice('L"', 'u"', 'U"', 'u8"', '"'),
@@ -350,7 +350,8 @@ module.exports = grammar({
       /[^*]*\*+([^/*][^*]*\*+)*/,
       '/'
     ),
-    line_comment: $ => seq('//', /[^\n]*/, '\n'),
+    // line_comment: $ => seq('//', /[^\n]*/, '\n'),
+    line_comment: $ => seq('//', /(\\+(.|\r?\n)|[^\\\n])*/),
 
     // pragma   ::= '.pragma' STRING STRING?
     //
@@ -520,14 +521,26 @@ module.exports = grammar({
     //
     // https://souffle-lang.github.io/rules#query-plan-1
     negation: $ => prec.left(2, '!'),  // conflict: unary_op
-    conjunction: $ => commas1(seq(
-      repeat($.negation),
-      choice(
-        $.atom,
-        $._constraint,
-        parens($.disjunction)
-      ),
-    )),
+    conjunction: $ => seq(
+      optional(choice($.line_comment, $.block_comment)),
+      optional($.negation),
+      $.atom,
+      repeat(seq(
+        ',',
+        optional(choice($.line_comment, $.block_comment)),
+        optional($.negation),
+        choice(
+          $.atom,
+          $._constraint,
+          parens($.disjunction)
+        )
+      ))
+    ),
+
+    body: $ => seq(
+      $.atom,
+      repeat(seq(',', optional($.line_comment), $.atom))
+    ),
 
     // constraint ::= argument ( '<' | '>' | '<=' | '>=' | '=' | '!=' ) argument
     //            | ( 'match' | 'contains' ) '(' argument ',' argument ')'
@@ -569,7 +582,7 @@ module.exports = grammar({
     //
     atom: $ => seq(
       field('relation', $.qualified_name),
-      parens(commas(field('argument', $._argument)))
+      parens(commas(field('argument', $._argument))),
     ),
 
     // argument ::=
@@ -895,7 +908,10 @@ module.exports = grammar({
 
     // https://souffle-lang.github.io/facts#syntax
     qualified_name: $ => prec.left(dots1($.ident)),
-    ident: $ => /(_|\?|[A-Z]|[a-z])(([A-Z]|[a-z])|[0-9]|_|\?)*/,
+    // ident: $ => /(_|\?|[A-Z]|[a-z])(([A-Z]|[a-z])|[0-9]|_|\?)*/,
+    ident: _ =>
+      // eslint-disable-next-line max-len
+      /(\p{XID_Start}|\$|_|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})(\p{XID_Continue}|\$|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*/,
   }
 });
 
