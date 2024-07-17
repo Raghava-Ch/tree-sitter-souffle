@@ -115,6 +115,9 @@ module.exports = grammar({
   // inline: $ => [
   //   $._natural,
   // ],
+  conflicts: $ => [
+    [$.ident, $.component_name]
+  ],
 
   rules: {
     // program  ::= ( pragma | functor_decl | component_decl | component_init | directive | rule | fact | relation_decl | type_decl )*
@@ -918,9 +921,16 @@ module.exports = grammar({
     attribute: $ => seq(field('var', $.ident), ':', field('type', $._type_name)),
 
     // https://souffle-lang.github.io/facts#syntax
-    qualified_name: $ => prec.left(dots1($.ident)),
+    qualified_name: $ => prec.left(seq(
+      prec.left(2, optional(repeat(seq($.component_name, '.')))),
+      $.ident
+    )),
     // ident: $ => /(_|\?|[A-Z]|[a-z])(([A-Z]|[a-z])|[0-9]|_|\?)*/,
     ident: _ =>
+      // eslint-disable-next-line max-len
+      /(\p{XID_Start}|\$|_|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})(\p{XID_Continue}|\$|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*/,
+
+    component_name: _ =>
       // eslint-disable-next-line max-len
       /(\p{XID_Start}|\$|_|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})(\p{XID_Continue}|\$|\\u[0-9A-Fa-f]{4}|\\U[0-9A-Fa-f]{8})*/,
   }
