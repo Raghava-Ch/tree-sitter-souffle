@@ -2215,6 +2215,58 @@
       "members": [
         {
           "type": "SYMBOL",
+          "name": "block_comment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "line_comment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "pragma"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "functor_decl"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "component_decl"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "component_init"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "directive"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_rule"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "fact"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "relation_decl"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "type_decl"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "legacy_type_decl"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "preprocessor"
+        },
+        {
+          "type": "SYMBOL",
           "name": "preproc_if"
         },
         {

@@ -1918,6 +1918,46 @@
       "required": false,
       "types": [
         {
+          "type": "block_comment",
+          "named": true
+        },
+        {
+          "type": "component_decl",
+          "named": true
+        },
+        {
+          "type": "component_init",
+          "named": true
+        },
+        {
+          "type": "directive",
+          "named": true
+        },
+        {
+          "type": "fact",
+          "named": true
+        },
+        {
+          "type": "functor_decl",
+          "named": true
+        },
+        {
+          "type": "legacy_type_decl",
+          "named": true
+        },
+        {
+          "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "monotonic_rule",
+          "named": true
+        },
+        {
+          "type": "pragma",
+          "named": true
+        },
+        {
           "type": "preproc_if",
           "named": true
         },
@@ -1927,6 +1967,22 @@
         },
         {
           "type": "preproc_include",
+          "named": true
+        },
+        {
+          "type": "preprocessor",
+          "named": true
+        },
+        {
+          "type": "relation_decl",
+          "named": true
+        },
+        {
+          "type": "subsumptive_rule",
+          "named": true
+        },
+        {
+          "type": "type_decl",
           "named": true
         }
       ]
@@ -1970,6 +2026,46 @@
       "required": false,
       "types": [
         {
+          "type": "block_comment",
+          "named": true
+        },
+        {
+          "type": "component_decl",
+          "named": true
+        },
+        {
+          "type": "component_init",
+          "named": true
+        },
+        {
+          "type": "directive",
+          "named": true
+        },
+        {
+          "type": "fact",
+          "named": true
+        },
+        {
+          "type": "functor_decl",
+          "named": true
+        },
+        {
+          "type": "legacy_type_decl",
+          "named": true
+        },
+        {
+          "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "monotonic_rule",
+          "named": true
+        },
+        {
+          "type": "pragma",
+          "named": true
+        },
+        {
           "type": "preproc_if",
           "named": true
         },
@@ -1979,6 +2075,22 @@
         },
         {
           "type": "preproc_include",
+          "named": true
+        },
+        {
+          "type": "preprocessor",
+          "named": true
+        },
+        {
+          "type": "relation_decl",
+          "named": true
+        },
+        {
+          "type": "subsumptive_rule",
+          "named": true
+        },
+        {
+          "type": "type_decl",
           "named": true
         }
       ]
@@ -1993,6 +2105,46 @@
       "required": false,
       "types": [
         {
+          "type": "block_comment",
+          "named": true
+        },
+        {
+          "type": "component_decl",
+          "named": true
+        },
+        {
+          "type": "component_init",
+          "named": true
+        },
+        {
+          "type": "directive",
+          "named": true
+        },
+        {
+          "type": "fact",
+          "named": true
+        },
+        {
+          "type": "functor_decl",
+          "named": true
+        },
+        {
+          "type": "legacy_type_decl",
+          "named": true
+        },
+        {
+          "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "monotonic_rule",
+          "named": true
+        },
+        {
+          "type": "pragma",
+          "named": true
+        },
+        {
           "type": "preproc_if",
           "named": true
         },
@@ -2002,6 +2154,22 @@
         },
         {
           "type": "preproc_include",
+          "named": true
+        },
+        {
+          "type": "preprocessor",
+          "named": true
+        },
+        {
+          "type": "relation_decl",
+          "named": true
+        },
+        {
+          "type": "subsumptive_rule",
+          "named": true
+        },
+        {
+          "type": "type_decl",
           "named": true
         }
       ]
@@ -2065,6 +2233,46 @@
       "required": false,
       "types": [
         {
+          "type": "block_comment",
+          "named": true
+        },
+        {
+          "type": "component_decl",
+          "named": true
+        },
+        {
+          "type": "component_init",
+          "named": true
+        },
+        {
+          "type": "directive",
+          "named": true
+        },
+        {
+          "type": "fact",
+          "named": true
+        },
+        {
+          "type": "functor_decl",
+          "named": true
+        },
+        {
+          "type": "legacy_type_decl",
+          "named": true
+        },
+        {
+          "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "monotonic_rule",
+          "named": true
+        },
+        {
+          "type": "pragma",
+          "named": true
+        },
+        {
           "type": "preproc_if",
           "named": true
         },
@@ -2074,6 +2282,22 @@
         },
         {
           "type": "preproc_include",
+          "named": true
+        },
+        {
+          "type": "preprocessor",
+          "named": true
+        },
+        {
+          "type": "relation_decl",
+          "named": true
+        },
+        {
+          "type": "subsumptive_rule",
+          "named": true
+        },
+        {
+          "type": "type_decl",
           "named": true
         }
       ]
@@ -2117,6 +2341,46 @@
       "required": false,
       "types": [
         {
+          "type": "block_comment",
+          "named": true
+        },
+        {
+          "type": "component_decl",
+          "named": true
+        },
+        {
+          "type": "component_init",
+          "named": true
+        },
+        {
+          "type": "directive",
+          "named": true
+        },
+        {
+          "type": "fact",
+          "named": true
+        },
+        {
+          "type": "functor_decl",
+          "named": true
+        },
+        {
+          "type": "legacy_type_decl",
+          "named": true
+        },
+        {
+          "type": "line_comment",
+          "named": true
+        },
+        {
+          "type": "monotonic_rule",
+          "named": true
+        },
+        {
+          "type": "pragma",
+          "named": true
+        },
+        {
           "type": "preproc_if",
           "named": true
         },
@@ -2126,6 +2390,22 @@
         },
         {
           "type": "preproc_include",
+          "named": true
+        },
+        {
+          "type": "preprocessor",
+          "named": true
+        },
+        {
+          "type": "relation_decl",
+          "named": true
+        },
+        {
+          "type": "subsumptive_rule",
+          "named": true
+        },
+        {
+          "type": "type_decl",
           "named": true
         }
       ]
