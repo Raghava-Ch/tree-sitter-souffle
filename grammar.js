@@ -521,25 +521,23 @@ module.exports = grammar({
     //
     // https://souffle-lang.github.io/rules#query-plan-1
     negation: $ => prec.left(2, '!'),  // conflict: unary_op
+    inline_ref: $ => prec.left(2, '@'),  // conflict: unary_op
     conjunction: $ => seq(
       optional(choice($.line_comment, $.block_comment)),
       optional($.negation),
-      $.atom,
+      optional($.inline_ref),
+      choice($.atom, $.comparison),
       repeat(seq(
         ',',
         optional(choice($.line_comment, $.block_comment)),
         optional($.negation),
+        optional($.inline_ref),
         choice(
           $.atom,
           $._constraint,
           parens($.disjunction)
         )
       ))
-    ),
-
-    body: $ => seq(
-      $.atom,
-      repeat(seq(',', optional($.line_comment), $.atom))
     ),
 
     // constraint ::= argument ( '<' | '>' | '<=' | '>=' | '=' | '!=' ) argument

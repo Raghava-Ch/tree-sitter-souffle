@@ -3441,6 +3441,14 @@
         "value": "!"
       }
     },
+    "inline_ref": {
+      "type": "PREC_LEFT",
+      "value": 2,
+      "content": {
+        "type": "STRING",
+        "value": "@"
+      }
+    },
     "conjunction": {
       "type": "SEQ",
       "members": [
@@ -3478,8 +3486,29 @@
           ]
         },
         {
-          "type": "SYMBOL",
-          "name": "atom"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "inline_ref"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "atom"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "comparison"
+            }
+          ]
         },
         {
           "type": "REPEAT",
@@ -3528,6 +3557,18 @@
                 "members": [
                   {
                     "type": "SYMBOL",
+                    "name": "inline_ref"
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
+              },
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
                     "name": "atom"
                   },
                   {
@@ -3552,43 +3593,6 @@
                     ]
                   }
                 ]
-              }
-            ]
-          }
-        }
-      ]
-    },
-    "body": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "atom"
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "STRING",
-                "value": ","
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "line_comment"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              },
-              {
-                "type": "SYMBOL",
-                "name": "atom"
               }
             ]
           }

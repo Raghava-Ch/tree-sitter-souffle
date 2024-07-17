@@ -1210,6 +1210,10 @@
           "named": true
         },
         {
+          "type": "inline_ref",
+          "named": true
+        },
+        {
           "type": "line_comment",
           "named": true
         },
@@ -1572,6 +1576,11 @@
   },
   {
     "type": "identifier",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "inline_ref",
     "named": true,
     "fields": {}
   },
