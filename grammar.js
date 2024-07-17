@@ -513,7 +513,7 @@ module.exports = grammar({
     // https://souffle-lang.github.io/rules#disjunction-1
     //
     disjunction: $ => prec.left(seq(
-      seq(optional('('), $.conjunction, optional(')')),
+      $.conjunction,
       repeat(seq(';', $.conjunction)),
     )),
 
@@ -526,7 +526,7 @@ module.exports = grammar({
       optional(choice($.line_comment, $.block_comment)),
       optional($.negation),
       optional($.inline_ref),
-      choice($.atom, $.comparison),
+      choice($.atom, $.comparison, prec.left(2, parens($.disjunction))),
       repeat(seq(
         ',',
         optional(choice($.line_comment, $.block_comment)),
